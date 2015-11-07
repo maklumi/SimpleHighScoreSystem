@@ -1,5 +1,7 @@
 package com.tutsplus.code.simplehighscoresystem;
 
+import android.util.Log;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -34,9 +36,9 @@ public class HighscoreManager {
     }
 
     private void sort() {
-       // ScoreComparator comparator = new ScoreComparator();
-        //to sort array, use Arrays.sort(). to sort arraylist, use Collection.sort(..)
-      //  Collections.sort(scores, comparator);
+        // ScoreComparator comparator = new ScoreComparator();
+        // to sort array, use Arrays.sort(). to sort arraylist, use Collection.sort(..)
+        //  Collections.sort(scores, comparator);
         Collections.sort(scores);
         //to sort according to name
         //Collections.sort(scores, Scores.namaPemainCOmparator);
@@ -44,8 +46,12 @@ public class HighscoreManager {
 
     public void addScore(String name, int score) {
         loadScoreFile();
-        scores.add(new Score(name, score));
-        updateScoreFile();
+        //check if same name and score no need to updatescorefile
+        if (isUniqueNameandScore(name, score)) {
+            scores.add(new Score(name, score));
+            updateScoreFile();
+        }
+
     }
 
     public void loadScoreFile() {
@@ -69,6 +75,19 @@ public class HighscoreManager {
                 System.out.println("[LoadScoreFile] IO Error: " + e.getMessage());
             }
         }
+    }
+
+    public boolean isUniqueNameandScore(String name, int score) {
+        //load array
+        //check if array has name and score
+        //if yes return false
+        for (Score person: scores) {
+            if (person.getName()== name && person.getScore() == score) {
+                Log.i("nameuniqe", "not unique name score");
+                return false;
+            }
+        }
+        return true;
     }
 
     public void updateScoreFile() {
@@ -112,6 +131,13 @@ public class HighscoreManager {
         return highscoreString;
     }
 
-
+    public int getMinNumberCanEnterTopTen() {
+        int length = scores.size();
+        int minEligible = 0;
+        if (length > 10) {
+            return scores.get(9).getScore();
+        }
+        return scores.get(length-1).getScore();
+    }
 
 }
